@@ -198,7 +198,7 @@ export default function CelebrationPage() {
 
                 <div className="flex flex-col items-start leading-none">
                   <span className="text-gray-400 text-[10px] tracking-[0.4em] uppercase mb-2 font-sm md:font-medium">
-                    A Personal Message For
+                    Open Your New Year
                   </span>
                   <span className="text-white justify-center text-center font flex items-center gap-2 font-black tracking-[0.2em] uppercase text-xl sm:text-3xl">
                     {displayName} <span className="text-rose-500">✨</span>
@@ -246,7 +246,7 @@ export default function CelebrationPage() {
           </p>
           <h1 className="ui-reveal text-5xl font sm:text-8xl font-bold text-white tracking-tight leading-tight">
             Happy New Year, <br />
-            <span className="bg-gradient-to-r font2 from-rose-400 via-white to-rose-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r py-2 font2 from-rose-400 via-white to-rose-400 bg-clip-text text-transparent">
               {displayName}
             </span>
           </h1>

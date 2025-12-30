@@ -87,12 +87,17 @@ export default function CelebrationPage() {
     };
     render();
 
-    const tl = gsap.timeline();
-    const fireworkSound = new Audio(
-      "https://assets.mixkit.co/active_storage/sfx/588/588-preview.mp3"
-    );
+    // AUDIO CONFIGURATION
+    const fireworksAudio = new Audio("/fireworks.mpeg");
+    const newYearAudio = new Audio("/newyear.mpeg");
 
-    // Twinkle multi-colored bulbs
+    // Explicitly set loop to false so they play only once
+    fireworksAudio.loop = false;
+    newYearAudio.loop = false;
+
+    const tl = gsap.timeline();
+
+    // Twinkle bulbs animation
     gsap.to(".bulb", {
       opacity: 0.3,
       scale: 0.8,
@@ -116,17 +121,23 @@ export default function CelebrationPage() {
           duration: 1,
           ease: "elastic.out(1, 0.3)",
           onStart: () => {
-            fireworkSound.play().catch(() => {});
+            // Play both once
+            fireworksAudio
+              .play()
+              .catch((e) => console.log("Playback error", e));
+            newYearAudio.play().catch((e) => console.log("Playback error", e));
+
+            // Initial confetti drop
             allParticles.push(...createParticles(ctx, ww, wh, "pop"));
 
-            // Firework Sync: Only loop while sound is playing
+            // Visual Fireworks loop synced to audio
             const fwInterval = setInterval(() => {
-              if (fireworkSound.paused || fireworkSound.ended) {
+              if (fireworksAudio.paused || fireworksAudio.ended) {
                 clearInterval(fwInterval);
               } else {
                 allParticles.push(...createParticles(ctx, ww, wh, "firework"));
               }
-            }, 450);
+            }, 500);
           },
         },
         "-=0.2"
@@ -138,6 +149,11 @@ export default function CelebrationPage() {
         duration: 0.8,
         ease: "power2.out",
       });
+
+    return () => {
+      fireworksAudio.pause();
+      newYearAudio.pause();
+    };
   }, [isStarted]);
 
   const bulbColors = [
@@ -149,7 +165,7 @@ export default function CelebrationPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-black overflow-hidden font-sans selection:bg-rose-500/30">
-      {/* MULTI-COLOR BULB WIRE */}
+      {/* BULB WIRE */}
       <div className="absolute top-0 left-0 w-full flex justify-around px-2 z-30 pt-1">
         {[...Array(20)].map((_, i) => (
           <div key={i} className="flex flex-col items-center">
@@ -162,55 +178,51 @@ export default function CelebrationPage() {
           </div>
         ))}
       </div>
+
       {!isStarted && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] backdrop-blur-2xl">
-          {/* High-end Container for floating effect */}
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] backdrop-blur-2xl px-4">
           <div
             className="relative group cursor-pointer transform hover:scale-105 transition-all duration-500 animate-bounce-slow"
             onClick={() => setIsStarted(true)}
           >
-            {/* 1. Massive Animated Glow - Larger Blur Radius */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-rose-600 via-pink-500 to-purple-600 rounded-full blur-[20px] opacity-60 group-hover:opacity-100 group-hover:blur-[30px] transition duration-700 animate-pulse"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-rose-600 via-pink-500 to-purple-600 rounded-full blur-[20px] opacity-60 group-hover:opacity-100 transition duration-700 animate-pulse"></div>
 
-            {/* 2. The Main Cinematic Button */}
-            <button className="relative px-16 py-8 bg-black/80 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-2xl overflow-hidden">
-              {/* Shimmer Effect - A light ray that passes over the button */}
+            <button className="relative px-10 py-6 sm:px-16 sm:py-8 bg-black/80 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-2xl overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shimmer"></div>
 
-              <span className="flex items-center space-x-6">
-                {/* Status Indicator (Bigger) */}
-                <span className="flex h-4 w-4 relative">
+              <span className="flex items-center space-x-4 sm:space-x-6">
+                <span className="flex h-3 w-3 sm:h-4 sm:w-4 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-4 w-4 bg-rose-500 shadow-[0_0_10px_#f43f5e]"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 sm:h-4 sm:w-4 bg-rose-500"></span>
                 </span>
 
                 <div className="flex flex-col items-start leading-none">
-                  <span className="text-gray-400 text-[0.6rem] tracking-[0.4em] uppercase mb-2 font-medium">
+                  <span className="text-gray-400 text-[10px] tracking-[0.4em] uppercase mb-2 font-sm md:font-medium">
                     A Personal Message For
                   </span>
-                  <span className="text-white flex items-center gap-3 font-black tracking-[0.2em] uppercase text-2xl sm:text-3xl font2">
+                  <span className="text-white justify-center text-center font flex items-center gap-2 font-black tracking-[0.2em] uppercase text-xl sm:text-3xl">
                     {displayName} <span className="text-rose-500">✨</span>
                   </span>
                 </div>
               </span>
             </button>
-
-            {/* 3. Enhanced Hint Text */}
             <div className="absolute -bottom-16 left-0 right-0 flex flex-col items-center gap-2">
-              <p className="text-white/60 text-sm tracking-[0.5em] uppercase font-light animate-pulse">
+              <p className="text-white/40 text-[10px] tracking-[0.5em] uppercase font-light animate-pulse">
                 Click to Open
               </p>
-              <div className="w-1 h-8 bg-gradient-to-b from-rose-500 to-transparent rounded-full animate-bounce"></div>
+              <div className="w-[1px] h-8 bg-gradient-to-b from-rose-500 to-transparent rounded-full animate-bounce"></div>
             </div>
           </div>
         </div>
       )}
+
       <canvas
         ref={canvasRef}
         className="absolute inset-0 pointer-events-none z-20"
       />
+
       <div className="relative z-10 text-center px-6">
-        <div className="flex items-center justify-center gap-3 font-black text-[20vw] sm:text-[12rem] leading-none text-white tracking-tighter font2">
+        <div className="flex items-center justify-center font2 gap-3 font-black text-[18vw] sm:text-[11rem] leading-none text-white tracking-tighter">
           <span className="opacity-90">2</span>
           <span className="opacity-90">0</span>
           <span className="opacity-90">2</span>
@@ -228,11 +240,11 @@ export default function CelebrationPage() {
           </div>
         </div>
 
-        <div className="mt-8 space-y-3">
-          <p className="ui-reveal text-xs sm:text-sm tracking-[0.5em] text-white/40 uppercase font-medium">
+        <div className="mt-8 space-y-4">
+          <p className="ui-reveal text-[10px] sm:text-xs tracking-[0.5em] text-white/40 uppercase font-medium">
             Est. 2026
           </p>
-          <h1 className="ui-reveal font text-6xl sm:text-8xl font-bold text-white tracking-tight">
+          <h1 className="ui-reveal text-5xl font sm:text-8xl font-bold text-white tracking-tight leading-tight">
             Happy New Year, <br />
             <span className="bg-gradient-to-r font2 from-rose-400 via-white to-rose-400 bg-clip-text text-transparent">
               {displayName}
